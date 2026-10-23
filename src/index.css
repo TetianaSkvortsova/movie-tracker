@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@theme {
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    --color-brand-red: var(--app-primary);
+    --color-brand-hover: #f6121d;
+    --color-dark-bg: var(--app-bg-dark);
+    --color-dark-card: var(--app-bg-card);
+    --color-dark-border: #334155;
+}
+
+:root {
+    --app-primary: #e50914;
+    --app-bg-dark: #0f172a;
+    --app-bg-card: #1e293b;
+}
+
+body {
+    background-color: var(--color-dark-bg);
+    color: #f8fafc;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
