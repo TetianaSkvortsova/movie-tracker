@@ -2,6 +2,7 @@ import './App.css'
 import {Layout} from 'antd'
 import {AppHeader} from "./components/Header/Header.tsx";
 import {Banner} from "./components/Banner/Banner.tsx";
+import {FilterPanel} from "./components/FilterPanel/FilterPanel.tsx";
 
 const {Content} = Layout;
 
@@ -13,6 +14,7 @@ function App() {
                 <AppHeader/>
                 <Content className="p-4 md:p-8 max-w-7xl mx-auto w-full">
                     <Banner />
+                    <FilterPanel />
                 </Content>
             </Layout>
         </>
