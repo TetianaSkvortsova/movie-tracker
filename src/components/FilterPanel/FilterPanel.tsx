@@ -1,6 +1,7 @@
 import {Filter} from 'lucide-react';
 import {Divider, Row, Col, Select, Typography, Slider, Button} from "antd";
 import {useState} from "react";
+// import {APP_COLORS} from "../../theme/colors.ts";
 
 const {Text} = Typography;
 const SORT_OPTIONS = [
@@ -34,7 +35,7 @@ export const FilterPanel = () => {
                         value={sortBy}
                         onChange={setSortBy}
                         options={SORT_OPTIONS}
-                        className="w-40 !border-indigo-600"
+                        className="w-40"
                     />
                 </div>
             </div>
@@ -48,7 +49,7 @@ export const FilterPanel = () => {
                         value={selectedGenres}
                         options={GENRES_OPTIONS}
                         onChange={setSelectedGenres}
-                        className="w-full !border-indigo-600"
+                        className="w-full"
 
                         allowClear
                     >
@@ -77,7 +78,7 @@ export const FilterPanel = () => {
                             setMinRating(0);
                             setSearchQuery('');
                         }}
-                        className="text-xs text-slate-400 hover:text-white !border-indigo-600"
+                        className="text-xs text-slate-400 hover:text-white "
                     >
                         Скинути фільтри
                     </Button>
