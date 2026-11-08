@@ -20,7 +20,7 @@ export const FilterPanel = () => {
     const [sortBy, setSortBy] = useState('rating');
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [minRating, setMinRating] = useState(0);
-    const [searchQuery, setSearchQuery] = useState('');
+    // const [searchQuery, setSearchQuery] = useState('');
     return (
         <div className="bg-[#1e293b]/90 p-5 rounded-2xl border border-slate-800 space-y-4 my-8">
             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -76,7 +76,7 @@ export const FilterPanel = () => {
                         onClick={() => {
                             setSelectedGenres([]);
                             setMinRating(0);
-                            setSearchQuery('');
+                            // setSearchQuery('');
                         }}
                         className="text-xs text-slate-400 hover:text-white "
                     >
