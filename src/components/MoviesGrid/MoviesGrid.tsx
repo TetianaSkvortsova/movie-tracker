@@ -2,11 +2,19 @@ import {Col, Row, Typography, Tooltip, Button, Tag} from "antd";
 
 const {Title} = Typography;
 import {Film, Heart, Bookmark, Play, Star, Check} from "lucide-react";
-import {MOCK_MOVIES} from "../../../public/mockMovies.ts";
+import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
+import {useEffect} from "react";
+import {fetchMovies} from "../../store/moviesSlice.ts";
+
 // import {useState} from "react";
 
 export const MoviesGrid = () => {
-
+    const IMG_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+    const dispatch = useAppDispatch();
+    const { movies, loading } = useAppSelector((state) => state.movies);
+    useEffect(() => {
+        dispatch(fetchMovies());
+    }, [dispatch]);
     return (
         <div>
             <div className="flex items-center justify-between mb-4">
@@ -19,7 +27,7 @@ export const MoviesGrid = () => {
             {/*    Add block if no films found*/}
             <Row gutter={[20, 24]}>
 
-                {MOCK_MOVIES.map((movie) => {
+                {movies.map((movie) => {
                     const isWatchlisted = false;
                     const isWatchedItem = false;
                     const isFav = true;
@@ -34,7 +42,7 @@ export const MoviesGrid = () => {
                             >
                                 <div className="relative aspect-[2/3] overflow-hidden bg-slate-800">
                                     <img
-                                        src={movie.poster}
+                                        src={`${IMG_BASE_URL}${movie.poster_path}`}
                                         alt={movie.title}
                                         className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                                     />
@@ -80,7 +88,7 @@ export const MoviesGrid = () => {
                                     <div className="absolute top-2 left-2 z-0">
                                         <span
                                             className="bg-black/70 backdrop-blur-md text-amber-400 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
-                                          <Star className="w-3 h-3 fill-amber-400 text-amber-400"/> {movie.rating}
+                                          <Star className="w-3 h-3 fill-amber-400 text-amber-400"/> {movie.vote_average}
                                         </span>
                                     </div>
                                 </div>
@@ -90,8 +98,9 @@ export const MoviesGrid = () => {
                                             {movie.title}
                                         </h3>
                                         <div className="flex items-center justify-between text-xs text-slate-400 mt-1">
-                                            <span>{movie.year}</span>
-                                            <span className="truncate max-w-[80px]">{movie.genres[0]}</span>
+                                            <span>{movie.release_date}</span>
+                                            {/*<span className="truncate max-w-[80px]">{movie.genres[0]}</span>*/}
+                                            <span className="truncate max-w-[80px]">Жанр</span>
                                         </div>
                                     </div>
                                     <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between">
@@ -107,9 +116,9 @@ export const MoviesGrid = () => {
                                             <span className="text-[10px] text-slate-500">Не переглянуто</span>
                                         )}
 
-                                        {movie.rating && (
+                                        {movie.vote_average && (
                                             <span className="text-xs text-amber-400 font-bold flex items-center gap-0.5">
-                                    ★ {movie.rating}/10
+                                    ★ {movie.vote_average}/10
                                   </span>
                                         )}
                                     </div>
