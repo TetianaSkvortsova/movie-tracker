@@ -4,9 +4,10 @@ import {tmdbApi} from "../api/tmbd.ts";
 export interface Movie {
     id: number;
     title: string;
-    poster_path : string;
-    release_date: string;
-    vote_average: boolean;
+    posterPath : string;
+    releaseDate: string;
+    voteAverage: number;
+    genres: string[];
 }
 
 interface MoviesState {
@@ -14,7 +15,6 @@ interface MoviesState {
     loading: boolean;
     error: string | null;
 }
-// const initialMovies: Movies[] = [];
 const initialState: MoviesState = {
     movies: [],
     loading: false,
@@ -24,14 +24,27 @@ const initialState: MoviesState = {
 export const fetchMovies = createAsyncThunk(
     'movies/fetchMovies',
     async () => {
-        // Використовуємо ендпоінт популярних або трендових фільмів
-        const response = await tmdbApi.get('/trending/movie/day');
-        return response.data.results; // Повертає масив фільмів
+        const [moviesResponse, genresResponse] = await Promise.all([
+            tmdbApi.get('/trending/movie/day'),
+            tmdbApi.get('/genre/movie/list'),
+        ]);
+        const genresMap: Record<number, string> = {};
+        genresResponse.data.genres.forEach((genre: { id: number; name: string }) => {
+            genresMap[genre.id] = genre.name;
+        });
+        return moviesResponse.data.results.map((movie: Record<string, any>) => ({
+            id: movie.id,
+            title: movie.title,
+            posterPath: movie.poster_path,
+            releaseDate: movie.release_date ? movie.release_date.slice(0, 4) : '',
+            voteAverage: Number(movie.vote_average.toFixed(1)),
+            genres: movie.genre_ids.map((id: number) => genresMap[id] || 'Кіно'),
+        }));
     }
 );
 
 const moviesSlice = createSlice({
-    name: 'todos',
+    name: 'movies',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
@@ -42,7 +55,6 @@ const moviesSlice = createSlice({
             })
             .addCase(fetchMovies.fulfilled, (state, action) => {
                 state.loading = false;
-                // Записуємо отримані фільми в стейт
                 state.movies = action.payload;
             })
             .addCase(fetchMovies.rejected, (state, action) => {
@@ -51,4 +63,5 @@ const moviesSlice = createSlice({
             });
     },
 });
+
 export default moviesSlice.reducer;

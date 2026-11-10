@@ -1,10 +1,14 @@
-import {configureStore} from "@reduxjs/toolkit";
+import {combineReducers, configureStore} from "@reduxjs/toolkit";
 import moviesReducer from './moviesSlice';
+import bannerReducer from './bannerSlice';
+
+const rootReducer = combineReducers({
+    banner: bannerReducer,
+    movies: moviesReducer,
+});
 
 export const store = configureStore({
-    reducer: {
-        movies: moviesReducer,
-    },
+    reducer: rootReducer,
 });
 
 /*store.subscribe(() => {

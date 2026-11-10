@@ -3,3 +3,8 @@
     width: 100%;
     max-width: 1200px;
 }
+
+.ant-carousel .slick-dots li button {
+    background-color: #94a3b8; /* колір неактивних (наприклад, сірий) */
+    opacity: 0.5;
+}

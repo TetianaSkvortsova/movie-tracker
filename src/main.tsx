@@ -3,6 +3,9 @@ import './index.css'
 import App from './App.tsx'
 import {ConfigProvider, theme} from "antd";
 import {APP_COLORS} from "./theme/colors.ts";
+import {Provider} from "react-redux";
+import {store} from "./store/store.ts";
+import {BrowserRouter} from "react-router-dom";
 
 createRoot(document.getElementById('root')!).render(
     <ConfigProvider
@@ -19,6 +22,10 @@ createRoot(document.getElementById('root')!).render(
             },
         }}
     >
-        <App/>
+        <Provider store={store}>
+            <BrowserRouter>
+                <App/>
+            </BrowserRouter>
+        </Provider>
     </ConfigProvider>
 )
