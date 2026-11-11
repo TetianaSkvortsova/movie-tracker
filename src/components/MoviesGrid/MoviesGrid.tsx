@@ -1,14 +1,21 @@
 import {Col, Row, Typography, Tooltip, Button, Tag} from "antd";
 import {Film, Heart, Bookmark, Play, Star, Check} from "lucide-react";
 import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {fetchMovies} from "../../store/moviesSlice.ts";
+import {TrailerModal} from "../TrailerModal/TrailerModal.tsx";
 const {Title} = Typography;
 
 export const MoviesGrid = () => {
     const IMG_BASE_URL = 'https://image.tmdb.org/t/p/w500';
     const dispatch = useAppDispatch();
     const { movies, loading, error } = useAppSelector((state) => state.movies);
+    const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
+    const [isTrailerOpen, setIsTrailerOpen] = useState<boolean>(false);
+    const handleOpenTrailer = (movieId: number) => {
+        setSelectedMovieId(movieId);
+        setIsTrailerOpen(true);
+    };
 
     useEffect(() => {
         dispatch(fetchMovies());
@@ -79,11 +86,7 @@ export const MoviesGrid = () => {
                                                 block
                                                 size="small"
                                                 icon={<Play className="w-3.5 h-3.5 fill-current"/>}
-                                                /*onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setSelectedMovie(movie);
-                                                    setTrailerModalVisible(true);
-                                                }}*/
+                                                onClick={() => handleOpenTrailer(movie.id)}
                                                 className="bg-red-600 hover:bg-red-700 text-xs font-semibold rounded-lg"
                                             >
                                                 Трейлер
@@ -132,6 +135,11 @@ export const MoviesGrid = () => {
                     )
                 })}
             </Row>
+            <TrailerModal
+                movieId={selectedMovieId}
+                visible={isTrailerOpen}
+                onClose={() => setIsTrailerOpen(false)}
+            />
         </div>
     );
 };
