@@ -1,6 +1,7 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {tmdbApi} from "../api/tmbd.ts";
 
+type SortOption = 'voteAverage' | 'title' | 'releaseDate';
 export interface Movie {
     id: number;
     title: string;
@@ -12,13 +13,17 @@ export interface Movie {
 
 interface MoviesState {
     movies: Movie[];
+    allMovies: Movie[];
     loading: boolean;
     error: string | null;
+    sortBy: SortOption;
 }
 const initialState: MoviesState = {
     movies: [],
+    allMovies: [],
     loading: false,
     error: null,
+    sortBy: 'voteAverage',
 };
 
 export const fetchMovies = createAsyncThunk(
@@ -43,10 +48,31 @@ export const fetchMovies = createAsyncThunk(
     }
 );
 
+const sortMovies = (moviesList: Movie[], sortBy: string) => {
+    return [...moviesList].sort((a, b) => {
+        if (sortBy === 'voteAverage') {
+            return b.voteAverage - a.voteAverage;
+        }
+        // Add sorts
+        return 0;
+    });
+};
+
 const moviesSlice = createSlice({
     name: 'movies',
     initialState,
-    reducers: {},
+    reducers: {
+        /*setSortBy: (state, action) => {
+            state.sortBy = action.payload;
+            if (action.payload === 'voteAverage') {
+                state.movies.sort((a, b) => b.voteAverage-a.voteAverage);
+            }
+        },
+        resetFilters: (state) => {
+            state.sortBy = 'voteAverage';
+            state.movies = [...state.allMovies];
+        }*/
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchMovies.pending, (state) => {
@@ -55,7 +81,8 @@ const moviesSlice = createSlice({
             })
             .addCase(fetchMovies.fulfilled, (state, action) => {
                 state.loading = false;
-                state.movies = action.payload;
+                state.allMovies = action.payload;
+                state.movies = sortMovies(action.payload, state.sortBy);
             })
             .addCase(fetchMovies.rejected, (state, action) => {
                 state.loading = false;
