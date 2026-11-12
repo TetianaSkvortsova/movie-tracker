@@ -2,6 +2,7 @@ import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {tmdbApi} from "../api/tmbd.ts";
 
 type SortOption = 'voteAverage' | 'title' | 'releaseDate';
+
 export interface Movie {
     id: number;
     title: string;
@@ -14,16 +15,22 @@ export interface Movie {
 interface MoviesState {
     movies: Movie[];
     allMovies: Movie[];
+    genres: string[];
     loading: boolean;
     error: string | null;
     sortBy: SortOption;
+    selectedGenres: [];
+    minRating: number;
 }
 const initialState: MoviesState = {
     movies: [],
     allMovies: [],
+    genres: [],
     loading: false,
     error: null,
     sortBy: 'voteAverage',
+    selectedGenres: [],
+    minRating: 0,
 };
 
 export const fetchMovies = createAsyncThunk(
@@ -48,30 +55,73 @@ export const fetchMovies = createAsyncThunk(
     }
 );
 
-const sortMovies = (moviesList: Movie[], sortBy: string) => {
-    return [...moviesList].sort((a, b) => {
+const applyFiltersAndSorting = (
+    moviesList: Movie[],
+    sortBy: string,
+    selectedGenres: string[],
+    minRating: number
+) => {
+    const filtered = moviesList.filter((movie) => {
+        const matchesGenres = selectedGenres.length > 0
+            ? selectedGenres.some((genre) => movie.genres.includes(genre))
+            : true;
+
+        const matchesRating = movie.voteAverage >= minRating;
+
+        return matchesGenres && matchesRating;
+    });
+
+    return filtered.sort((a, b) => {
         if (sortBy === 'voteAverage') {
             return b.voteAverage - a.voteAverage;
         }
-        // Add sorts
+        if (sortBy === 'title') {
+            return a.title.localeCompare(b.title);
+        }
+        if (sortBy === 'releaseDate') {
+            return Number(b.releaseDate) - Number(a.releaseDate);
+        }
         return 0;
     });
-};
+}
 
 const moviesSlice = createSlice({
     name: 'movies',
     initialState,
     reducers: {
-        /*setSortBy: (state, action) => {
+        setSortBy: (state, action) => {
             state.sortBy = action.payload;
-            if (action.payload === 'voteAverage') {
-                state.movies.sort((a, b) => b.voteAverage-a.voteAverage);
-            }
+            state.movies = applyFiltersAndSorting(
+                state.allMovies,
+                state.sortBy,
+                state.selectedGenres,
+                state.minRating
+            );
+        },
+        setGenreFilter: (state, action) => {
+            state.selectedGenres = action.payload;
+            state.movies = applyFiltersAndSorting(
+                state.allMovies,
+                state.sortBy,
+                state.selectedGenres,
+                state.minRating
+            );
+        },
+        setMinRatingFilter: (state, action) => {
+            state.minRating = action.payload;
+            state.movies = applyFiltersAndSorting(
+                state.allMovies,
+                state.sortBy,
+                state.selectedGenres,
+                state.minRating
+            );
         },
         resetFilters: (state) => {
             state.sortBy = 'voteAverage';
-            state.movies = [...state.allMovies];
-        }*/
+            state.selectedGenres = [];
+            state.minRating = 0;
+            state.movies = applyFiltersAndSorting(state.allMovies, 'voteAverage', [], 0);
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -82,7 +132,19 @@ const moviesSlice = createSlice({
             .addCase(fetchMovies.fulfilled, (state, action) => {
                 state.loading = false;
                 state.allMovies = action.payload;
-                state.movies = sortMovies(action.payload, state.sortBy);
+
+                const allGenresSet = new Set<string>();
+                action.payload.forEach((movie: Movie) => {
+                    movie.genres.forEach((genre) => allGenresSet.add(genre));
+                });
+
+                state.genres = Array.from(allGenresSet);
+                state.movies = applyFiltersAndSorting(
+                    action.payload,
+                    state.sortBy,
+                    state.selectedGenres,
+                    state.minRating
+                );
             })
             .addCase(fetchMovies.rejected, (state, action) => {
                 state.loading = false;
@@ -90,5 +152,12 @@ const moviesSlice = createSlice({
             });
     },
 });
+
+export const {
+    setSortBy,
+    setGenreFilter,
+    setMinRatingFilter,
+    resetFilters
+} = moviesSlice.actions;
 
 export default moviesSlice.reducer;

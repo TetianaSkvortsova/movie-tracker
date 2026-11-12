@@ -1,26 +1,37 @@
 import {Filter} from 'lucide-react';
 import {Divider, Row, Col, Select, Typography, Slider, Button} from "antd";
-import {useState} from "react";
-// import {APP_COLORS} from "../../theme/colors.ts";
+import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
+import {resetFilters, setGenreFilter, setMinRatingFilter, setSortBy} from "../../store/moviesSlice";
 
 const {Text} = Typography;
 const SORT_OPTIONS = [
-    {value: 'rating', label: 'Рейтингом'},
-    {value: 'year', label: 'Роком виходу'},
+    {value: 'voteAverage', label: 'Рейтингом'},
+    {value: 'releaseDate', label: 'Роком виходу'},
     {value: 'title', label: 'Назвою'},
 ];
 
-const GENRES_LIST = ["Sci-Fi", "Action", "Adventure", "Drama", "Biography", "History", "Crime", "Animation", "Mystery"];
-const GENRES_OPTIONS = GENRES_LIST.map((genre) => ({
-    value: genre,
-    label: genre,
-}));
-
 export const FilterPanel = () => {
-    const [sortBy, setSortBy] = useState('rating');
-    const [selectedGenres, setSelectedGenres] = useState([]);
-    const [minRating, setMinRating] = useState(0);
-    // const [searchQuery, setSearchQuery] = useState('');
+    const dispatch = useAppDispatch();
+    const genresList = useAppSelector((state) => state.movies.genres);
+    const genresOptions = genresList.map((genre: string) => ({
+        value: genre,
+        label: genre,
+    }));
+    const selectedGenres = useAppSelector((state) => state.movies.selectedGenres);
+    const handleGenreChange = (values: string[]) => {
+        dispatch(setGenreFilter(values));
+    };
+    const sortBy = useAppSelector((state) => state.movies.sortBy);
+    const handleSortChange = (value: string) => {
+        dispatch(setSortBy(value));
+    };
+    const minRating = useAppSelector((state) => state.movies.minRating);
+    const handleRatingChange = (value: number) => {
+        dispatch(setMinRatingFilter(value));
+    };
+    const handleReset = () => {
+        dispatch(resetFilters());
+    };
     return (
         <div className="bg-[#1e293b]/90 p-5 rounded-2xl border border-slate-800 space-y-4 my-8">
             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -33,7 +44,7 @@ export const FilterPanel = () => {
                     <Text className="text-slate-400 text-sm">Сортувати за:</Text>
                     <Select
                         value={sortBy}
-                        onChange={setSortBy}
+                        onChange={handleSortChange}
                         options={SORT_OPTIONS}
                         className="w-40"
                     />
@@ -47,8 +58,8 @@ export const FilterPanel = () => {
                         mode="multiple"
                         placeholder="Оберіть жанри..."
                         value={selectedGenres}
-                        options={GENRES_OPTIONS}
-                        onChange={setSelectedGenres}
+                        options={genresOptions}
+                        onChange={handleGenreChange}
                         className="w-full"
 
                         allowClear
@@ -64,7 +75,7 @@ export const FilterPanel = () => {
                         max={10}
                         step={0.5}
                         value={minRating}
-                        onChange={setMinRating}
+                        onChange={handleRatingChange}
                         classNames={{
                             rail: 'bg-slate-800',
                             track: 'bg-[#e50914]',
@@ -73,11 +84,7 @@ export const FilterPanel = () => {
                 </Col>
                 <Col xs={24} lg={4} className="!flex justify-end">
                     <Button
-                        onClick={() => {
-                            setSelectedGenres([]);
-                            setMinRating(0);
-                            // setSearchQuery('');
-                        }}
+                        onClick={handleReset}
                         className="text-xs text-slate-400 hover:text-white "
                     >
                         Скинути фільтри
