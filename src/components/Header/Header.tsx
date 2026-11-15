@@ -1,9 +1,19 @@
 import {Input, Layout, Menu} from "antd";
 import {SearchOutlined} from "@ant-design/icons";
+import {useAppDispatch} from "../../store/hooks.ts";
+import {fetchMovies, searchMovies} from "../../store/moviesSlice.ts";
 
 const {Header} = Layout;
 
 export const AppHeader = () => {
+    const dispatch = useAppDispatch();
+    const handleSearch = (value: string) => {
+        if (value.trim() === '') {
+            dispatch(fetchMovies());
+        } else {
+            dispatch(searchMovies(value));
+        }
+    };
     return (
         <>
             <Header className="bg-slate-900 border-b border-slate-800 px-8 sticky top-0 z-50">
@@ -45,12 +55,13 @@ export const AppHeader = () => {
                             ]}
                         />
                     </div>
-                    <Input
+                    <Input.Search
                         placeholder="Пошук фільмів..."
                         prefix={<SearchOutlined className="text-slate-400 mr-1"/>}
                         allowClear
                         size="middle"
-                        className="!rounded-full !w-64 !h-9"
+                        className="!rounded-full !w-64 !h-8"
+                        onSearch={handleSearch}
                     />
                 </div>
             </Header>

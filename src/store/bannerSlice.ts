@@ -27,7 +27,7 @@ export const fetchWeeklyTrends = createAsyncThunk(
     'bannerMovies/fetchWeeklyTrends',
     async () => {
         const weeklyTrends = await tmdbApi.get('/trending/movie/week');
-        console.log(weeklyTrends);
+        // console.log(weeklyTrends);
         return weeklyTrends.data.results.map((movie: Record<string, any>) => ({
             id: movie.id,
             title: movie.title,

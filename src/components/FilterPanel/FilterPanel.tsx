@@ -1,7 +1,7 @@
 import {Filter} from 'lucide-react';
 import {Divider, Row, Col, Select, Typography, Slider, Button} from "antd";
 import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
-import {resetFilters, setGenreFilter, setMinRatingFilter, setSortBy} from "../../store/moviesSlice";
+import {resetFilters, setGenreFilter, setMinRatingFilter, setSortBy} from "../../store/moviesSlice.ts";
 
 const {Text} = Typography;
 const SORT_OPTIONS = [
@@ -12,11 +12,12 @@ const SORT_OPTIONS = [
 
 export const FilterPanel = () => {
     const dispatch = useAppDispatch();
-    const genresList = useAppSelector((state) => state.movies.genres);
-    const genresOptions = genresList.map((genre: string) => ({
-        value: genre,
-        label: genre,
-    }));
+    const genresList = useAppSelector((state) => state.genres.genres);
+    const genresOptions = genresList.map((genre: {id: number, name: string}) => ({
+        value: genre.id,
+        label: genre.name,
+    }))
+
     const selectedGenres = useAppSelector((state) => state.movies.selectedGenres);
     const handleGenreChange = (values: string[]) => {
         dispatch(setGenreFilter(values));
@@ -61,7 +62,6 @@ export const FilterPanel = () => {
                         options={genresOptions}
                         onChange={handleGenreChange}
                         className="w-full"
-
                         allowClear
                     >
                     </Select>

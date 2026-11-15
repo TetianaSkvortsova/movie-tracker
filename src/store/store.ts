@@ -1,11 +1,13 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit";
-import moviesReducer from './moviesSlice';
+import moviesReducer from './moviesSlice.ts';
 import bannerReducer from './bannerSlice';
+import genresReducer from './genresSlice';
 
 const rootReducer = combineReducers({
-    banner: bannerReducer,
     movies: moviesReducer,
-});
+    banner: bannerReducer,
+    genres: genresReducer,
+})
 
 export const store = configureStore({
     reducer: rootReducer,

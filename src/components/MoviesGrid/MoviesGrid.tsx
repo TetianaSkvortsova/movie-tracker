@@ -1,15 +1,21 @@
 import {Col, Row, Typography, Tooltip, Button, Tag} from "antd";
 import {Film, Heart, Bookmark, Play, Star, Check} from "lucide-react";
-import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
-import {useEffect, useState} from "react";
-import {fetchMovies} from "../../store/moviesSlice.ts";
+import { useAppSelector} from "../../store/hooks.ts";
+import { useState} from "react";
 import {TrailerModal} from "../TrailerModal/TrailerModal.tsx";
+import {applyFiltersAndSorting} from "../utils/utils.ts";
 const {Title} = Typography;
 
 export const MoviesGrid = () => {
     const IMG_BASE_URL = 'https://image.tmdb.org/t/p/w500';
-    const dispatch = useAppDispatch();
-    const { movies, loading, error } = useAppSelector((state) => state.movies);
+    const movies = useAppSelector((state) => {
+        return applyFiltersAndSorting(state.movies?.movies, {
+            sortBy: state.movies?.sortBy || 'voteAverage',
+            selectedGenres: state.movies?.selectedGenres || [],
+            minRating: state.movies?.minRating || 0,
+        });
+    });
+    const { loading, error } = useAppSelector((state) => state.movies);
     const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
     const [isTrailerOpen, setIsTrailerOpen] = useState<boolean>(false);
     const handleOpenTrailer = (movieId: number) => {
@@ -17,16 +23,16 @@ export const MoviesGrid = () => {
         setIsTrailerOpen(true);
     };
 
-    useEffect(() => {
-        dispatch(fetchMovies());
-    }, [dispatch]);
-
     if (loading) {
         return <div className="text-center py-10">Завантаження фільмів... ⏳</div>;
     }
 
     if (error) {
         return <div className="text-red-500 text-center">Помилка: {error}</div>;
+    }
+
+    if (movies.length === 0) {
+        return <div className="text-red-500 text-center">Такого фільму немає</div>;
     }
     return (
         <div>
@@ -107,7 +113,7 @@ export const MoviesGrid = () => {
                                         </h3>
                                         <div className="flex items-center justify-between text-xs text-slate-400 mt-1">
                                             <span>{movie.releaseDate}</span>
-                                            <span className="truncate max-w-[80px]">{movie.genres[0]}</span>
+                                            <span className="truncate max-w-[80px]">{movie.genre?.name}</span>
                                         </div>
                                     </div>
                                     <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between">
